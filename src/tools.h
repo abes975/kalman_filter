@@ -25,6 +25,19 @@ public:
   */
   Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
 
+
+  /*
+  * A helper method to convert polar coordinates to cartesian coordinates.
+  * Used when the source of measurement is RADAR
+  */
+  static Eigen::VectorXd ConvertPolarToCartesian(const Eigen::VectorXd& polar);
+
+  /*
+  * A helper method to convert cartesian coordinates to polar.
+  * Used when the source of measurement is  RADAR in UpdateEKF
+  */
+Eigen::VectorXd ConvertCartesianToPolar(const Eigen::VectorXd& cartesian);
+
 };
 
 #endif /* TOOLS_H_ */

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "tools.h"
+#include "math.h"
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
@@ -48,4 +49,37 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
         py * (vx * py - vy * px)/ c3, px * ( vy* px - vx * py) / c3, px/c2, py/c2;
 
   return Hj;
+}
+
+VectorXd Tools::ConvertPolarToCartesian(const VectorXd& polar) {
+    VectorXd cartesian(4);
+
+    float rho = polar(0);
+    float phi = polar(1);
+    // velocity
+    float rho_v = polar(2);
+
+    float px = rho * cos(phi);
+    float py = rho * sin(phi);
+    float vx = rho_v * cos(phi);
+    float vy = rho_v * sin(phi);
+
+    cartesian << px, py, vx, vy;
+    return cartesian;
+}
+
+VectorXd Tools::ConvertCartesianToPolar(const Eigen::VectorXd& cartesian) {
+    VectorXd polar(3);
+
+    float px = cartesian(0);
+    float py = cartesian(1);
+    float vx = cartesian(1);
+    float vy = cartesian(2);
+
+    float rho = sqrt(px * px + py * py);
+    float phi = atan2(py, px);
+    float rho_v = (px * vx + py * vy)/rho;
+
+    polar << rho, phi, rho_v;
+    return polar;
 }

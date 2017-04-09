@@ -1,4 +1,5 @@
 #include "kalman_filter.h"
+#include "tools.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -18,7 +19,7 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 }
 
 void KalmanFilter::Predict() {
-  x = F_ * x;
+  x_ = F_ * x_;
   MatrixXd Ft = F_.transpose();
   P_ = F_ * P_ * Ft + Q_;
 }
@@ -30,15 +31,25 @@ void KalmanFilter::Update(const VectorXd &z) {
   MatrixXd Si = S.inverse();
   MatrixXd K = P_ * Ht * Si;
 
-  MatrxXd I = MatrixXd::Identiry(x_.size(),x_.size());
+  MatrixXd I = MatrixXd::Identity(x_.size(),x_.size());
 
-  x_ = x_ + (K_ * y);
-  P_ = (I - K_ * H_) * P_;
+  x_ = x_ + (K * y);
+  P_ = (I - K * H_) * P_;
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  /**
-  TODO:
-    * update the state by using Extended Kalman Filter equations
-  */
+  Tools tools;
+
+  Eigen::VectorXd h = tools.ConvertCartesianToPolar(x_);
+
+  VectorXd y = z - h;
+  MatrixXd Ht = H_.transpose();
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
+  MatrixXd K = P_ * Ht * Si;
+
+  x_ = x_ + (K * y);
+  MatrixXd I = MatrixXd::Identity(x_.size(), x_.size());
+  P_ = (I - K * H_) * P_;
+
 }
